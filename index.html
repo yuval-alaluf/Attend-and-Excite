@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta property="og:title" content="Attend-and-Excite: Attention-Based Semantic Guidance for Text-to-Image Diffusion Models"/>
+  <meta property="og:url" content="https://attendandexcite.github.io/attend-and-excite/"/>
+  <meta property="og:image" content="static/images/og_tag_header_image.jpg" />
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+
+
+  <title>Attend and Excite</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+  rel="stylesheet">
+  <link rel="icon" href="static/figures/elephant.jpeg">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="static/js/bulma-slider.min.js"></script>
+  <script src="static/js/index.js"></script>
+</head>
+<body>
+
+
+<section class="publication-header">
+  <div class="hero-body">
+    <div class="container is-max-widescreen">
+      <!-- <div class="columns is-centered"> -->
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Attend-and-Excite: Attention-Based Semantic Guidance for
+Text-to-Image Diffusion Models</h1>
+        </div>
+    </div>
+  </div>   
+</section>
+
+<section class="publication-author-block">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+		<div class="is-size-3 publication-authors">
+            <span class="author-block">Anonymous Authors<sup></sup></span>
+          </div>
+          
+          <div class="is-size-3 publication-authors">
+            <!-- span class="author-block"> </span> 
+            <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              
+              <span class="link-block">
+                <a href="" target="_blank"
+                  class="external-link button is-normal is-rounded">
+                  <span class="icon">
+                    <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              
+              <!-- Colab Link. -->
+              <span class="link-block">
+                <a href="https://github.com/AttendAndExcite/Attend-and-Excite" target="_blank"
+                class="external-link button is-normal is-rounded">
+                <span class="icon">
+                  <i class="fab fa-github"></i>
+                </span>
+                <span>Code</span>
+              </a>
+              </span>
+             <!--span class="link-block">
+              <a href=""  target="_blank"
+                 class="external-link button is-normal is-rounded">
+                <span class="icon">
+                    <i class="fas fa-infinity"></i>
+                </span>
+                <span>Colab</span>
+              </a>
+             </span>
+            
+            <!--span class="link-block">
+              <a href=""  target="_blank"
+                 class="external-link button is-normal is-rounded">
+                <span class="icon">
+                    <i class="fas fa-laptop"></i>
+                </span>
+                <span>Demo</span>
+              </a>
+             </span -->
+           
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-small">
+  <!-- <div class="hero-body"> -->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <!-- <div id="results-carousel" class="carousel results-carousel"> -->
+      <div class="container">
+      <div class="item">
+      <div class="column is-centered has-text-centered">
+        <img src="static/figures/teaser.jpg" alt="Attend_and_Excite"/>
+      
+      <h2 class="subtitle">
+	Given a pre-trained text-to-image diffusion model, our method guides the generative
+	model to modify the cross-attention values during the image synthesis process to attend to all subjects in the text. Stable Diffusion alone (top row) struggles to generate multiple objects (e.g., a horse and a dog). However, by incorporating Attend-and-Excite (bottom row) to strengthen the subject tokens (marked in blue), we achieve images that are more semantically faithful with respect to the input text prompts. 
+      </h2>
+	  </div>
+    </div>
+  </div>
+ <!--  </div> -->
+  </div>
+  </div>
+ <!--  </div> -->
+</section>
+
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <!-- div class="item">
+          <p style="margin-bottom: 30px">
+        <video poster="" id="tree" autoplay controls muted loop height="100%">
+          <source src="static/figures/video.mp4"
+          type="video/mp4">
+        </video>
+        </p>
+        </div -->
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Recent text-to-image generative models have demonstrated an unparalleled
+			ability to generate diverse and creative imagery guided by a target text
+			prompt. While revolutionary, current state-of-the-art diffusion models may
+			still fail in generating images that fully convey the semantics in the given
+			text prompt. We analyze the publicly available Stable Diffusion model and
+			assess the existence of catastrophic neglect, where the model fails to generate
+			one or more of the subjects from the input prompt. Moreover, we find that
+			in some cases the model also fails to correctly bind attributes (e.g. colors)
+			to their corresponding subjects. To help mitigate these failure cases, we
+			introduce the concept of Generative Semantic Nursing (GSN), where we
+			seek to intervene in the generative process on the fly during inference time
+			to improve the faithfulness of the generated images. Using an attention-
+			based formulation of GSN, dubbed Attend-and-Excite, we guide the model
+			to refine the cross-attention units to attend to all subject tokens in the text
+			prompt and strengthen — or excite — their activations, encouraging the
+			model to generate all subjects described in the text prompt. We compare
+			our approach to alternative approaches and demonstrate that it conveys the
+			desired concepts more faithfully across a range of text prompts.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+  </div>
+</section>
+
+
+
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title has-text-centered">Examples of Text-to-Image Generation with Attend-and-Excite</h2>
+      <div id="results-carousel" class="carousel results-carousel">
+	  <div class="column is-centered has-text-centered">
+        <img src="static/figures/grizzly.jpg" alt="cars peace" width="800px"/>
+      </div>
+	  <div class="column is-centered has-text-centered">
+        <img src="static/figures/elephant.jpg" alt="cars peace" width="800px"/>
+      </div>
+	  <div class="column is-centered has-text-centered">
+        <img src="static/figures/dog_mouse.jpg" alt="cars peace" width="800px"/>
+      </div>
+      <div class="column is-centered has-text-centered">
+        <img src="static/figures/picasso.jpg " alt="cars peace"  width="800px"/>
+	   </div>
+	   <div class="column is-centered has-text-centered">
+        <img src="static/figures/lion_glasses.jpg" alt="cars peace" width="800px"/>
+      </div>
+	   <div class="column is-centered has-text-centered">
+        <img src="static/figures/cake_tulips.jpg" alt="cars peace" width="800px"/>
+      </div>
+	  <div class="column is-centered has-text-centered">
+        <img src="static/figures/swan_kitchen.jpg" alt="cars peace" width="800px"/>
+      </div>
+	   <div class="column is-centered has-text-centered">
+        <img src="static/figures/cat_dog.jpg" alt="cars peace" width="800px"/>
+      </div>
+	  <div class="column is-centered has-text-centered">
+        <img src="static/figures/mouse_car.jpg" alt="cars peace" width="800px"/>
+      </div>
+	  <div class="column is-centered has-text-centered">
+        <img src="static/figures/dolphins.jpg" alt="cars peace" width="800px"/>
+      </div>
+  </div>
+</div>
+</div>
+</section>
+
+
+
+
+
+
+
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">How does it work?</h2>
+        <div class="content has-text-justified">
+        </div>
+		<div class="column is-centered has-text-centered">
+        <img src="static/figures/semantic_issues.png" alt="cars peace" width="700px"/>
+		</div>
+		<p class="content has-text-justified">
+            We observe two semantic issues of existing text-to-image models. 
+			First, catastrophic neglect, where one or more subjects is not generated by the model, such as the cat in the example on the left. 
+			Second, incorrect attribute bindings, where an attribute such as a color is incorrectly matched to a subject. In the example on the right, the bench is incorrectly colored yellow instead of brown. 
+  
+          </p>
+        <div class="column is-centered has-text-centered">
+        <img src="static/figures/overview.png" alt="cars peace" width="700px"/>
+      </div>
+        <div class="content has-text-justified">
+          <p>
+			Text conditioning in Stable Diffusion is performed via the cross-attention mechanism. As illustrated on the second row, the attention matrix can be reshaped to obtain a spatial map per text token. Intuitively, for a token to be manifested in the generated image, there should be at least one patch in its map with a high activation value. Attend-and-Excite embodies this intuition by shifting the latent such that it is encouraged to attend to all subject tokens in the text.
+			<br>
+            Given a prompt (e.g., "A lion with a crown"), we extract the subject tokens (lion, crown), and their corresponding attention maps (second row). We apply a Gaussian kernel on each attention map to obtain smoothed attention maps that consider the neighboring patches. Our optimization enhances the maximal activation of the most neglected token at timestep t and updates the latent code accordingly (row 3). In other words, we shift the latent in the current timestep such that the attention maps for the updated latents attend to the most neglected token. 
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+  </div>
+</section> 
+
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <!-- <p style="margin-top: 30px; margin-bottom: 30px"> -->
+      <h2 class="title has-text-centered">Using Cross-Attention as Explanation</h2>
+      <!-- </p> -->
+      
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="column is-centered has-text-centered">
+        <img src="static/figures/expl_cat_frog.png" width="400" class="is-centered"/>
+        </div>
+        <div class="column is-centered has-text-centered">
+        <img src="static/figures/expl_elephant_crown.png" width="400" class="is-centered"/>
+        </div>
+		<div class="column is-centered has-text-centered">
+        <img src="static/figures/expl_turtle_bowl.png" width="400" class="is-centered"/>
+        </div>
+		<div class="column is-centered has-text-centered">
+        <img src="static/figures/expl_backpack_glasses.png" width="400" class="is-centered"/>
+        </div>
+    </div>
+  </div>
+
+</section>
+
+
+
+
+
+
+
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <!-- Paper poster -->
+
+      <h2 class="title has-text-centered">Uncurated Results</h2>
+      <p style="margin-top: 30px; margin-bottom: 30px">
+      <!-- <div class="column is-four-fifths"> -->
+          <div class="column is-centered has-text-centered">
+        <img src="static/figures/uncurated.jpg" alt="cars peace" width="800px"/>
+      </div>
+       </p>
+		<h2 class="subtitle is-centered has-text-centered">
+          Uncurated results with the same 8 random seeds comparing Stable Diffusion and Attend-and-Excite.
+        </h2>
+      </div>
+    </div>
+
+  </section>
+
+
+
+<footer class="footer">
+ <!--  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link"
+      href="https://homes.cs.washington.edu/~kpar/nerfies/videos/nerfies_paper.pdf">
+      <i class="fas fa-file-pdf"></i>
+    </a>
+    <a class="icon-link" href="https://github.com/keunhong" class="external-link" disabled>
+      <i class="fab fa-github"></i>
+    </a>
+  </div> -->
+  <div class="columns is-centered">
+    <div class="column is-8">
+      <div class="content">
+        <p>
+          This website is licensed under a <a rel="license"
+          href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+        Commons Attribution-ShareAlike 4.0 International License</a>.
+      </p>
+      <p>
+        Website source code based on the <a href="https://nerfies.github.io/"> Nerfies</a> project page. If you want to reuse their <a
+        href="https://github.com/nerfies/nerfies.github.io">source code</a>, please credit them appropriately.
+      </p>
+    </div>
+  </div>
+</div>
+</div>
+</footer>
+
+
+  <script type="text/javascript">
+    var sc_project=12351448; 
+    var sc_invisible=1; 
+    var sc_security="c676de4f"; 
+  </script>
+  <script type="text/javascript"
+  src="https://www.statcounter.com/counter/counter.js"
+  async></script>
+  <noscript><div class="statcounter"><a title="Web Analytics"
+    href="https://statcounter.com/" target="_blank"><img
+    class="statcounter"
+    src="https://c.statcounter.com/12351448/0/c676de4f/1/"
+    alt="Web Analytics"></a></div></noscript>
+    <!-- End of Statcounter Code -->
+
+  </body>
+  </html>
