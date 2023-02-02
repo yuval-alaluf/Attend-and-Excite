@@ -27,9 +27,7 @@ conda activate ldm
 On top of these requirements, we add several requirements which can be found in `environment/requirements.txt`. These requirements will be installed in the above command.
 
 ### Hugging Face Diffusers Library
-Our code relies also on Hugging Face's [diffusers](https://github.com/huggingface/diffusers) library for downloading the Stable Diffusion v1.4 model.
-
-In `config.py`, you should add your personal token under the argument `huggingface_token`. 
+Our code relies also on Hugging Face's [diffusers](https://github.com/huggingface/diffusers) library for downloading the Stable Diffusion v1.4 model. 
 
 
 ## Usage
