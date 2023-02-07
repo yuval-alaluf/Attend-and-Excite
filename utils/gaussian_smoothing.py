@@ -68,7 +68,7 @@ class GaussianSmoothing(nn.Module):
         Returns:
             filtered (torch.Tensor): Filtered output.
         """
-        return self.conv(input, weight=self.weight, groups=self.groups)
+        return self.conv(input, weight=self.weight.to(input.dtype), groups=self.groups)
 
 
 class AverageSmoothing(nn.Module):
