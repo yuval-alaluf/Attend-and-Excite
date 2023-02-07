@@ -1,5 +1,5 @@
 import pprint
-from typing import List
+from typing import List, Optional
 
 import pyrallis
 import torch
@@ -19,7 +19,6 @@ def load_model(config: RunConfig):
     stable = AttendAndExcitePipeline.from_pretrained("CompVis/stable-diffusion-v1-4").to(device)
     return stable
 
-
 def get_indices_to_alter(stable, prompt: str) -> List[int]:
     token_idx_to_word = {idx: stable.tokenizer.decode(t)
                          for idx, t in enumerate(stable.tokenizer(prompt)['input_ids'])
@@ -37,7 +36,8 @@ def run_on_prompt(prompt: List[str],
                   controller: AttentionStore,
                   token_indices: List[int],
                   seed: torch.Generator,
-                  config: RunConfig) -> Image.Image:
+                  config: RunConfig,
+                  latents: Optional[torch.FloatTensor] = None) -> Image.Image:
     if controller is not None:
         ptp_utils.register_attention_control(model, controller)
     outputs = model(prompt=prompt,
@@ -46,6 +46,7 @@ def run_on_prompt(prompt: List[str],
                     attention_res=config.attention_res,
                     guidance_scale=config.guidance_scale,
                     generator=seed,
+                    latents=latents,
                     num_inference_steps=config.n_inference_steps,
                     max_iter_to_alter=config.max_iter_to_alter,
                     run_standard_sd=config.run_standard_sd,

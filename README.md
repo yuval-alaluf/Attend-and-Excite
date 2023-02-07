@@ -72,5 +72,8 @@ Example cross-attention visualizations.
 as seen in the illustration above.
 This notebook can be used to provide an explanation for the generations produced by Attend-and-Excite.
 
+### Explainability on arbitrary images
+`notebooks/explain_image.ipynb` shows cross-attention maps on existing images. It illustrates how some concepts (e.g. subjects tokens and easily identifiable body parts) can be located in the image reliably from the attention maps, while other concepts aren't identifiable. This notebook was contributed by Christian Laforte from Stability AI.
+
 ## Acknowledgements 
 This code is builds on the code from the [diffusers](https://github.com/huggingface/diffusers) library as well as the [Prompt-to-Prompt](https://github.com/google/prompt-to-prompt/) codebase.
