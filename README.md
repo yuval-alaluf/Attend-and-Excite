@@ -53,6 +53,7 @@ Notes:
 
 All generated images will be saved to the path `"{config.output_path}/{prompt}"`. We will also save a grid of all images (in the case of multiple seeds) under `config.output_path`.
 
+### Float16 Precision
 When loading the Stable Diffusion model, you can use `torch.float16` in order to use less memory and attain faster inference:
 ```python
 stable = AttendAndExcitePipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float16).to(device)
