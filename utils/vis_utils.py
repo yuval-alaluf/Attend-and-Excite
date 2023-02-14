@@ -48,7 +48,9 @@ def show_image_relevance(image_relevance, image: Image.Image, relevnace_res=16):
     image = np.array(image)
 
     image_relevance = image_relevance.reshape(1, 1, image_relevance.shape[-1], image_relevance.shape[-1])
+    image_relevance = image_relevance.cuda() # because float16 precision interpolation is not supported on cpu
     image_relevance = torch.nn.functional.interpolate(image_relevance, size=relevnace_res ** 2, mode='bilinear')
+    image_relevance = image_relevance.cpu() # send it back to cpu
     image_relevance = (image_relevance - image_relevance.min()) / (image_relevance.max() - image_relevance.min())
     image_relevance = image_relevance.reshape(relevnace_res ** 2, relevnace_res ** 2)
     image = (image - image.min()) / (image.max() - image.min())

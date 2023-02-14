@@ -7,6 +7,7 @@ from IPython.display import display
 from PIL import Image
 from typing import Union, Tuple, List
 
+from diffusers.models.cross_attention import CrossAttention
 
 def text_under_image(image: np.ndarray, text: str, text_color: Tuple[int, int, int] = (0, 0, 0)) -> np.ndarray:
     h, w, c = image.shape
@@ -53,57 +54,69 @@ def view_images(images: Union[np.ndarray, List],
     return pil_img
 
 
+class AttendExciteCrossAttnProcessor:
+
+    def __init__(self, attnstore, place_in_unet):
+        super().__init__()
+        self.attnstore = attnstore
+        self.place_in_unet = place_in_unet
+
+    def __call__(self, attn: CrossAttention, hidden_states, encoder_hidden_states=None, attention_mask=None):
+        batch_size, sequence_length, _ = hidden_states.shape
+        attention_mask = attn.prepare_attention_mask(attention_mask, sequence_length)
+
+        query = attn.to_q(hidden_states)
+
+        is_cross = encoder_hidden_states is not None
+        encoder_hidden_states = encoder_hidden_states if encoder_hidden_states is not None else hidden_states
+        key = attn.to_k(encoder_hidden_states)
+        value = attn.to_v(encoder_hidden_states)
+
+        query = attn.head_to_batch_dim(query)
+        key = attn.head_to_batch_dim(key)
+        value = attn.head_to_batch_dim(value)
+
+        attention_probs = attn.get_attention_scores(query, key, attention_mask)
+
+        self.attnstore(attention_probs, is_cross, self.place_in_unet)
+
+        hidden_states = torch.bmm(attention_probs, value)
+        hidden_states = attn.batch_to_head_dim(hidden_states)
+
+        # linear proj
+        hidden_states = attn.to_out[0](hidden_states)
+        # dropout
+        hidden_states = attn.to_out[1](hidden_states)
+
+        return hidden_states
+
+
 def register_attention_control(model, controller):
-    def ca_forward(self, place_in_unet):
 
-        def forward(x, context=None, mask=None):
-            batch_size, sequence_length, dim = x.shape
-            h = self.heads
-            q = self.to_q(x)
-            is_cross = context is not None
-            context = context if is_cross else x
-            k = self.to_k(context)
-            v = self.to_v(context)
-            q = self.reshape_heads_to_batch_dim(q)
-            k = self.reshape_heads_to_batch_dim(k)
-            v = self.reshape_heads_to_batch_dim(v)
-
-            sim = torch.einsum("b i d, b j d -> b i j", q, k) * self.scale
-
-            if mask is not None:
-                mask = mask.reshape(batch_size, -1)
-                max_neg_value = -torch.finfo(sim.dtype).max
-                mask = mask[:, None, :].repeat(h, 1, 1)
-                sim.masked_fill_(~mask, max_neg_value)
-
-            # attention, what we cannot get enough of
-            attn = sim.softmax(dim=-1)
-            # store attention matrix to controller
-            controller(attn, is_cross, place_in_unet)
-            out = torch.einsum("b i j, b j d -> b i d", attn, v)
-            out = self.reshape_batch_dim_to_heads(out)
-            return self.to_out(out)
-
-        return forward
-
-    def register_recr(net_, count, place_in_unet):
-        if net_.__class__.__name__ == 'CrossAttention':
-            net_.forward = ca_forward(net_, place_in_unet)
-            return count + 1
-        elif hasattr(net_, 'children'):
-            for net__ in net_.children():
-                count = register_recr(net__, count, place_in_unet)
-        return count
-
+    attn_procs = {}
     cross_att_count = 0
-    sub_nets = model.unet.named_children()
-    for net in sub_nets:
-        if "down" in net[0]:
-            cross_att_count += register_recr(net[1], 0, "down")
-        elif "up" in net[0]:
-            cross_att_count += register_recr(net[1], 0, "up")
-        elif "mid" in net[0]:
-            cross_att_count += register_recr(net[1], 0, "mid")
+    for name in model.unet.attn_processors.keys():
+        cross_attention_dim = None if name.endswith("attn1.processor") else model.unet.config.cross_attention_dim
+        if name.startswith("mid_block"):
+            hidden_size = model.unet.config.block_out_channels[-1]
+            place_in_unet = "mid"
+        elif name.startswith("up_blocks"):
+            block_id = int(name[len("up_blocks.")])
+            hidden_size = list(reversed(model.unet.config.block_out_channels))[block_id]
+            place_in_unet = "up"
+        elif name.startswith("down_blocks"):
+            block_id = int(name[len("down_blocks.")])
+            hidden_size = model.unet.config.block_out_channels[block_id]
+            place_in_unet = "down"
+        else:
+            continue
+
+        cross_att_count += 1
+        attn_procs[name] = AttendExciteCrossAttnProcessor(
+            attnstore=controller, place_in_unet=place_in_unet
+        )
+
+    model.unet.set_attn_processor(attn_procs)
     controller.num_att_layers = cross_att_count
 
 
