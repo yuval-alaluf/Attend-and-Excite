@@ -16,7 +16,12 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 def load_model(config: RunConfig):
     device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
-    stable = AttendAndExcitePipeline.from_pretrained("CompVis/stable-diffusion-v1-4").to(device)
+
+    if config.sd_2_1:
+        stable_diffusion_version = "stabilityai/stable-diffusion-2-1-base"
+    else:
+        stable_diffusion_version = "CompVis/stable-diffusion-v1-4"
+    stable = AttendAndExcitePipeline.from_pretrained(stable_diffusion_version).to(device)
     return stable
 
 
@@ -54,7 +59,8 @@ def run_on_prompt(prompt: List[str],
                     scale_range=config.scale_range,
                     smooth_attentions=config.smooth_attentions,
                     sigma=config.sigma,
-                    kernel_size=config.kernel_size)
+                    kernel_size=config.kernel_size,
+                    sd_2_1=config.sd_2_1)
     image = outputs.images[0]
     return image
 

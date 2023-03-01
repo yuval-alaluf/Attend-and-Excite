@@ -188,14 +188,21 @@ class AttendAndExcitePipeline(StableDiffusionPipeline):
 
         return text_inputs, prompt_embeds
 
-    @staticmethod
-    def _compute_max_attention_per_index(attention_maps: torch.Tensor,
+    def _compute_max_attention_per_index(self,
+                                         attention_maps: torch.Tensor,
                                          indices_to_alter: List[int],
                                          smooth_attentions: bool = False,
                                          sigma: float = 0.5,
-                                         kernel_size: int = 3) -> List[torch.Tensor]:
+                                         kernel_size: int = 3,
+                                         normalize_eot: bool = False) -> List[torch.Tensor]:
         """ Computes the maximum attention value for each of the tokens we wish to alter. """
-        attention_for_text = attention_maps[:, :, 1:-1]
+        last_idx = -1
+        if normalize_eot:
+            prompt = self.prompt
+            if isinstance(self.prompt, list):
+                prompt = self.prompt[0]
+            last_idx = len(self.tokenizer(prompt)['input_ids']) - 1
+        attention_for_text = attention_maps[:, :, 1:last_idx]
         attention_for_text *= 100
         attention_for_text = torch.nn.functional.softmax(attention_for_text, dim=-1)
 
@@ -218,7 +225,8 @@ class AttendAndExcitePipeline(StableDiffusionPipeline):
                                                    attention_res: int = 16,
                                                    smooth_attentions: bool = False,
                                                    sigma: float = 0.5,
-                                                   kernel_size: int = 3):
+                                                   kernel_size: int = 3,
+                                                   normalize_eot: bool = False):
         """ Aggregates the attention for each token and computes the max activation value for each token to alter. """
         attention_maps = aggregate_attention(
             attention_store=attention_store,
@@ -231,7 +239,8 @@ class AttendAndExcitePipeline(StableDiffusionPipeline):
             indices_to_alter=indices_to_alter,
             smooth_attentions=smooth_attentions,
             sigma=sigma,
-            kernel_size=kernel_size)
+            kernel_size=kernel_size,
+            normalize_eot=normalize_eot)
         return max_attention_per_index
 
     @staticmethod
@@ -265,7 +274,8 @@ class AttendAndExcitePipeline(StableDiffusionPipeline):
                                            smooth_attentions: bool = True,
                                            sigma: float = 0.5,
                                            kernel_size: int = 3,
-                                           max_refinement_steps: int = 20):
+                                           max_refinement_steps: int = 20,
+                                           normalize_eot: bool = False):
         """
         Performs the iterative latent refinement introduced in the paper. Here, we continuously update the latent
         code according to our loss objective until the given threshold is reached for all tokens.
@@ -286,7 +296,9 @@ class AttendAndExcitePipeline(StableDiffusionPipeline):
                 attention_res=attention_res,
                 smooth_attentions=smooth_attentions,
                 sigma=sigma,
-                kernel_size=kernel_size)
+                kernel_size=kernel_size,
+                normalize_eot=normalize_eot
+                )
 
             loss, losses = self._compute_loss(max_attention_per_index, return_losses=True)
 
@@ -324,7 +336,8 @@ class AttendAndExcitePipeline(StableDiffusionPipeline):
             attention_res=attention_res,
             smooth_attentions=smooth_attentions,
             sigma=sigma,
-            kernel_size=kernel_size)
+            kernel_size=kernel_size,
+            normalize_eot=normalize_eot)
         loss, losses = self._compute_loss(max_attention_per_index, return_losses=True)
         print(f"\t Finished with loss of: {loss}")
         return loss, latents, max_attention_per_index
@@ -360,6 +373,7 @@ class AttendAndExcitePipeline(StableDiffusionPipeline):
             smooth_attentions: bool = True,
             sigma: float = 0.5,
             kernel_size: int = 3,
+            sd_2_1: bool = False,
     ):
         r"""
         Function invoked when calling the pipeline for generation.
@@ -438,6 +452,7 @@ class AttendAndExcitePipeline(StableDiffusionPipeline):
         )
 
         # 2. Define call parameters
+        self.prompt = prompt
         if prompt is not None and isinstance(prompt, str):
             batch_size = 1
         elif prompt is not None and isinstance(prompt, list):
@@ -508,7 +523,8 @@ class AttendAndExcitePipeline(StableDiffusionPipeline):
                         attention_res=attention_res,
                         smooth_attentions=smooth_attentions,
                         sigma=sigma,
-                        kernel_size=kernel_size)
+                        kernel_size=kernel_size,
+                        normalize_eot=sd_2_1)
 
                     if not run_standard_sd:
 
@@ -531,7 +547,8 @@ class AttendAndExcitePipeline(StableDiffusionPipeline):
                                 attention_res=attention_res,
                                 smooth_attentions=smooth_attentions,
                                 sigma=sigma,
-                                kernel_size=kernel_size)
+                                kernel_size=kernel_size,
+                                normalize_eot=sd_2_1)
 
                         # Perform gradient update
                         if i < max_iter_to_alter:
