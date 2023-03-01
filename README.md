@@ -47,6 +47,7 @@ To generate an image, you can simply run the `run.py` script. For example,
 python run.py --prompt "a cat and a dog" --seeds [0] --token_indices [2,5]
 ```
 Notes:
+- To apply Attend-and-Excite on Stable Diffusion 2.1, specify: `--sd_2_1 True`
 - You may run multiple seeds by passing a list of seeds. For example, `--seeds [0,1,2,3]`.
 - If you do not provide a list of which token indices to alter using `--token_indices`, we will split the text according to the Stable Diffusion's tokenizer and display the index of each token. You will then be able to input which indices you wish to alter.
 - If you wish to run the standard Stable Diffusion model without Attend-and-Excite, you can do so by passing `--run_standard_sd True`.
