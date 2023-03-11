@@ -6,7 +6,6 @@
 <a href="https://attendandexcite.github.io/Attend-and-Excite/"><img src="https://img.shields.io/static/v1?label=Project&message=Website&color=red" height=20.5></a> 
 <a href="https://youtu.be/9EWs2IX4cus"><img src="https://img.shields.io/static/v1?label=5-Minute&message=Video&color=darkgreen" height=20.5></a> 
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/hysts/Attend-and-Excite)
-[![Replicate](https://replicate.com/daanelson/attend-and-excite/badge)](https://replicate.com/daanelson/attend-and-excite)
 
 
 <p align="center">
@@ -47,7 +46,6 @@ To generate an image, you can simply run the `run.py` script. For example,
 python run.py --prompt "a cat and a dog" --seeds [0] --token_indices [2,5]
 ```
 Notes:
-- To apply Attend-and-Excite on Stable Diffusion 2.1, specify: `--sd_2_1 True`
 - You may run multiple seeds by passing a list of seeds. For example, `--seeds [0,1,2,3]`.
 - If you do not provide a list of which token indices to alter using `--token_indices`, we will split the text according to the Stable Diffusion's tokenizer and display the index of each token. You will then be able to input which indices you wish to alter.
 - If you wish to run the standard Stable Diffusion model without Attend-and-Excite, you can do so by passing `--run_standard_sd True`.
@@ -55,7 +53,6 @@ Notes:
 
 All generated images will be saved to the path `"{config.output_path}/{prompt}"`. We will also save a grid of all images (in the case of multiple seeds) under `config.output_path`.
 
-### Float16 Precision
 When loading the Stable Diffusion model, you can use `torch.float16` in order to use less memory and attain faster inference:
 ```python
 stable = AttendAndExcitePipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float16).to(device)
@@ -79,6 +76,32 @@ Example cross-attention visualizations.
 `notebooks/explain.ipynb` produces a comparison of the cross-attention maps before and after applying Attend-and-Excite 
 as seen in the illustration above.
 This notebook can be used to provide an explanation for the generations produced by Attend-and-Excite.
+
+## Metrics 
+In `metrics/` we provide code needed to reproduce the quantitative experiments presented in the paper: 
+1. In `compute_clip_similarity.py`, we provide the code needed for computing the image-based CLIP similarities. Here, we compute the CLIP-space similarities between the generated images and the guiding text prompt. 
+2. In `blip_captioning_and_clip_similarity.py`, we provide the code needed for computing the text-based CLIP similarities. Here, we generate captions for each generated image using BLIP and compute the CLIP-space similarities between the generated captions and the guiding text prompt. 
+    - Note: to run this script you need to install the `lavis` library. This can be done using `pip install lavis`.
+
+To run the scripts, you simply need to pass the output directory containing the generated images. The direcory structure should be as follows:
+```
+outputs/
+|-- prompt_1/
+|   |-- 0.png 
+|   |-- 1.png
+|   |-- ...
+|   |-- 64.png
+|-- prompt_2/
+|   |-- 0.png 
+|   |-- 1.png
+|   |-- ...
+|   |-- 64.png
+...
+```
+The scripts will iterate through all the prompt outputs provided in the root output directory and aggregate results across all images. 
+
+The metrics will be saved to a `json` file under the path specified by `--metrics_save_path`. 
+
 
 ## Acknowledgements 
 This code is builds on the code from the [diffusers](https://github.com/huggingface/diffusers) library as well as the [Prompt-to-Prompt](https://github.com/google/prompt-to-prompt/) codebase.
