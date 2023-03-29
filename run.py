@@ -21,7 +21,10 @@ def load_model(config: RunConfig):
         stable_diffusion_version = "stabilityai/stable-diffusion-2-1-base"
     else:
         stable_diffusion_version = "CompVis/stable-diffusion-v1-4"
-    stable = AttendAndExcitePipeline.from_pretrained(stable_diffusion_version).to(device)
+    revision = None
+    if config.half_precision:
+        revision = "fp16"
+    stable = AttendAndExcitePipeline.from_pretrained(stable_diffusion_version, revision=revision).to(device)
     return stable
 
 
@@ -67,6 +70,8 @@ def run_on_prompt(prompt: List[str],
 
 @pyrallis.wrap()
 def main(config: RunConfig):
+    if config.half_precision:
+        torch.set_default_tensor_type(torch.HalfTensor)
     stable = load_model(config)
     token_indices = get_indices_to_alter(stable, config.prompt) if config.token_indices is None else config.token_indices
 
