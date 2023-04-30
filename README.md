@@ -1,4 +1,4 @@
-# Attend-and-Excite: Attention-Based Semantic Guidance for Text-to-Image Diffusion Models
+# Attend-and-Excite: Attention-Based Semantic Guidance for Text-to-Image Diffusion Models (SIGGRAPH 2023)
 
 > Hila Chefer*, Yuval Alaluf*, Yael Vinker, Lior Wolf, Daniel Cohen-Or  
 > Tel Aviv University  
@@ -112,3 +112,16 @@ The metrics will be saved to a `json` file under the path specified by `--metric
 
 ## Acknowledgements 
 This code is builds on the code from the [diffusers](https://github.com/huggingface/diffusers) library as well as the [Prompt-to-Prompt](https://github.com/google/prompt-to-prompt/) codebase.
+
+## Citation
+If you use this code for your research, please cite the following work: 
+```
+@misc{chefer2023attendandexcite,
+      title={Attend-and-Excite: Attention-Based Semantic Guidance for Text-to-Image Diffusion Models}, 
+      author={Hila Chefer and Yuval Alaluf and Yael Vinker and Lior Wolf and Daniel Cohen-Or},
+      year={2023},
+      eprint={2301.13826},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
