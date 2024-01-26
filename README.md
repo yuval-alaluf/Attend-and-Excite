@@ -109,6 +109,8 @@ The scripts will iterate through all the prompt outputs provided in the root out
 
 The metrics will be saved to a `json` file under the path specified by `--metrics_save_path`. 
 
+### Evaluation Prompts 
+The prompts used in our quantitative evaluations can be found [here](https://github.com/AttendAndExcite/Attend-and-Excite/files/11336216/a.e_prompts.txt). 
 
 ## Acknowledgements 
 This code is builds on the code from the [diffusers](https://github.com/huggingface/diffusers) library as well as the [Prompt-to-Prompt](https://github.com/google/prompt-to-prompt/) codebase.
