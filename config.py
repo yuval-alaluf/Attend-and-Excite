@@ -39,6 +39,8 @@ class RunConfig:
     kernel_size: int = 3
     # Whether to save cross attention maps for the final results
     save_cross_attention_maps: bool = False
+    # Whether to use half precision (low vram)
+    half_precision: bool = False
 
     def __post_init__(self):
         self.output_path.mkdir(exist_ok=True, parents=True)
